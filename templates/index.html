@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartScan Studio – Advanced IVP Enhancement & Transformation Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo-badge"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div class="brand-text">
+                <h1>SmartScan Studio <span>PRO</span></h1>
+                <p>Complete Image & Video Processing (IVP) Curriculum Platform</p>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="team-pills">
+                <span class="pill"><i class="fa-solid fa-user-gear"></i> Parth C. (E235)</span>
+                <span class="pill"><i class="fa-solid fa-shapes"></i> Divyansh K. (E236)</span>
+                <span class="pill lead"><i class="fa-solid fa-crown"></i> Himanshu G. (E250 - Lead)</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="panel-card upload-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-cloud-arrow-up"></i> Upload Document</h3>
+                </div>
+                <form id="upload-form">
+                    <div class="drop-zone" id="drop-zone">
+                        <i class="fa-solid fa-file-image"></i>
+                        <p class="drop-text">Drag & drop or <b>browse</b> image</p>
+                        <span class="drop-sub">PNG, JPG, TIFF, BMP</span>
+                        <input type="file" id="image-input" name="image" accept="image/*" required>
+                    </div>
+                    <div id="file-name-preview" class="file-preview-tag" style="display:none;"></div>
+                    <button type="submit" id="process-btn" class="glow-button">
+                        <i class="fa-solid fa-bolt"></i> Run IVP Master Suite
+                    </button>
+                </form>
+            </div>
+
+            <!-- LIVE METRICS -->
+            <div class="panel-card metrics-panel" id="metrics-card">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-chart-line"></i> Pipeline Benchmarks</h3>
+                </div>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <span class="label">PSNR Gain</span>
+                        <span class="value" id="m-psnr">-- dB</span>
+                        <span class="sub">Peak Signal-to-Noise</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">Contrast Ratio</span>
+                        <span class="value" id="m-cir">-- ×</span>
+                        <span class="sub">Standard Dev. CIR</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">Processing Time</span>
+                        <span class="value" id="m-time">-- s</span>
+                        <span class="sub">Full Suite Latency</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">HD Upscale</span>
+                        <span class="value" id="m-res">--</span>
+                        <span class="sub">Lanczos4 Enhanced</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CURRICULUM ACCORDION SUMMARY -->
+            <div class="panel-card syllabus-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-graduation-cap"></i> Syllabus Modules</h3>
+                </div>
+                <ul class="syllabus-list">
+                    <li><span class="badge">Mod 1</span> Data Rep & Color Spaces</li>
+                    <li><span class="badge">Mod 2</span> Point Ops, LUT & Histograms</li>
+                    <li><span class="badge">Mod 3</span> Spatial Filters & Sharpening</li>
+                    <li><span class="badge">Mod 4</span> Edge Extraction & Gradients</li>
+                    <li><span class="badge">Mod 5</span> Binary & Gray Morphology</li>
+                    <li><span class="badge">Mod 6</span> Global & Adaptive Segmentation</li>
+                    <li><span class="badge">Mod 7</span> 2D Discrete Fourier Transforms</li>
+                    <li><span class="badge lead-badge">Stage 4</span> Master HD Restoration</li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- HERO COMPARISON BANNER -->
+            <section class="hero-section" id="hero-banner" style="display:none;">
+                <div class="hero-header">
+                    <div class="hero-title">
+                        <h2><i class="fa-solid fa-gem text-gold"></i> Master Cleaned & HD Restored Document</h2>
+                        <p>Bilateral Edge Preserving + Non-Local Means (NLM) + Unsharp High-Frequency Boost + Lanczos4 2× Upscaling</p>
+                    </div>
+                    <div class="hero-actions">
+                        <a id="download-hd" href="#" download="smartscan_hd_restored.jpg" class="action-btn">
+                            <i class="fa-solid fa-download"></i> Download HD Result
+                        </a>
+                        <button class="action-btn secondary" onclick="toggleCompareMode()">
+                            <i class="fa-solid fa-code-compare"></i> Side-by-Side Comparison
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-compare-grid">
+                    <div class="compare-card">
+                        <div class="badge-tag original-tag">Original Input</div>
+                        <img id="hero-img-orig" src="" alt="Original Degraded">
+                    </div>
+                    <div class="compare-card hd-card">
+                        <div class="badge-tag hd-tag"><i class="fa-solid fa-sparkles"></i> 2× HD Restored (Clean Background & Crisp Text)</div>
+                        <img id="hero-img-hd" src="" alt="Master HD Restored">
+                    </div>
+                </div>
+            </section>
+
+            <!-- CATEGORY FILTER PILLS -->
+            <nav class="filter-nav" id="filter-nav" style="display:none;">
+                <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All (30+ Outputs)</button>
+                <button class="filter-btn" data-filter="color"><i class="fa-solid fa-palette"></i> Color & Rep</button>
+                <button class="filter-btn" data-filter="point"><i class="fa-solid fa-sliders"></i> Point & Hist</button>
+                <button class="filter-btn" data-filter="spatial"><i class="fa-solid fa-filter"></i> Filters & Sharpen</button>
+                <button class="filter-btn" data-filter="edges"><i class="fa-solid fa-draw-polygon"></i> Edges & Gradients</button>
+                <button class="filter-btn" data-filter="morph"><i class="fa-solid fa-cubes"></i> Morphology</button>
+                <button class="filter-btn" data-filter="seg"><i class="fa-solid fa-scissors"></i> Segmentation</button>
+                <button class="filter-btn" data-filter="freq"><i class="fa-solid fa-wave-square"></i> Frequency (DFT)</button>
+            </nav>
+
+            <!-- EMPTY STATE PLACEHOLDER -->
+            <div class="empty-state" id="empty-state">
+                <div class="pulse-icon"><i class="fa-solid fa-microscope"></i></div>
+                <h2>Interactive IVP Laboratory System</h2>
+                <p>Upload any degraded, noisy, or historical document from the left control panel to execute the end-to-end 7-module curriculum pipeline.</p>
+                <div class="quick-hints">
+                    <div class="hint-card"><i class="fa-solid fa-check"></i> <b>Removes:</b> Heavy shadows, salt-and-pepper noise, scanner grain</div>
+                    <div class="hint-card"><i class="fa-solid fa-check"></i> <b>Repairs:</b> Broken text strokes, fading ink, paper creases</div>
+                    <div class="hint-card"><i class="fa-solid fa-check"></i> <b>Produces:</b> Pure white background, razor-sharp text, 2× HD resolution</div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC GALLERY OF SYLLABUS CARDS -->
+            <section class="gallery-container" id="gallery-container" style="display:none;">
+                <!-- Cards will be populated dynamically -->
+                <div class="cards-grid" id="cards-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL FOR FULL-RESOLUTION INSPECTION -->
+    <div id="image-modal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modal-img">
+        <div id="modal-caption" class="modal-caption"></div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('image-input');
+        const fileNamePreview = document.getElementById('file-name-preview');
+
+        // File drag and drop handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                fileNamePreview.innerText = 'Selected: ' + e.target.files[0].name;
+                fileNamePreview.style.display = 'block';
+            }
+        });
+
+        // Pipeline Definition with All Curriculum Metadata
+        const PIPELINE_REGISTRY = [
+            // Module 1: Data Representation & Color
+            { key: 'original_color', title: '1. Original Colour Image', cat: 'color', desc: 'Standard 3-channel BGR representation (quantized 24-bit matrix).', module: 'Data Representation' },
+            { key: 'grayscale', title: '2. Quantized Grayscale (Luminance)', cat: 'color', desc: 'Single-channel intensity map: Y = 0.299R + 0.587G + 0.114B.', module: 'Data Representation' },
+            { key: 'binary', title: '3. Global Midpoint Binary (127)', cat: 'color', desc: 'Standard two-tone binary threshold at midpoint intensity 127.', module: 'Data Representation' },
+            { key: 'digital_negative', title: '4. Digital Negative (Inversion)', cat: 'point', desc: 'Point transformation: s = 255 - r, enhancing light details on dark areas.', module: 'Point Processing' },
+            { key: 'hsv_h', title: '5. HSV - Hue Channel', cat: 'color', desc: 'Dominant wavelength distribution independent of illumination.', module: 'Color Spaces' },
+            { key: 'hsv_s', title: '6. HSV - Saturation Channel', cat: 'color', desc: 'Purity/vibrancy of color components in the document.', module: 'Color Spaces' },
+            { key: 'hsv_v', title: '7. HSV - Value (Intensity) Channel', cat: 'color', desc: 'Brightness intensity component decoupling chromatic data.', module: 'Color Spaces' },
+            { key: 'ycrcb_y', title: '8. YCrCb - Luma (Y) Channel', cat: 'color', desc: 'Standard video broadcast luminance component.', module: 'Color Spaces' },
+            { key: 'ycrcb_cr', title: '9. YCrCb - Chroma Red (Cr)', cat: 'color', desc: 'Red-difference chroma component used in JPEG/MPEG encoding.', module: 'Color Spaces' },
+            { key: 'ycrcb_cb', title: '10. YCrCb - Chroma Blue (Cb)', cat: 'color', desc: 'Blue-difference chroma component used in compression standards.', module: 'Color Spaces' },
+
+            // Module 2: Point & Histogram
+            { key: 'log_transform', title: '11. Log Transformation', cat: 'point', desc: 's = c·log(1 + r): Expands low-intensity dark values and compresses bright values.', module: 'Point Processing' },
+            { key: 'gamma_brighten', title: '12. Power-Law Gamma (γ = 0.5)', cat: 'point', desc: 'Non-linear expansion of shadow/underexposed detail.', module: 'Point Processing' },
+            { key: 'gamma_darken', title: '13. Power-Law Gamma (γ = 2.0)', cat: 'point', desc: 'Increases contrast in bright, washed-out paper regions.', module: 'Point Processing' },
+            { key: 'contrast_stretch', title: '14. Contrast Stretching', cat: 'point', desc: 'Piecewise linear scaling stretching dynamic range to full [0, 255].', module: 'Point Processing' },
+            { key: 'intensity_slice', title: '15. Intensity Level Slicing', cat: 'point', desc: 'Bandpass highlighting mid-tone band [100, 180] as white.', module: 'Point Processing' },
+            { key: 'hist_eq', title: '16. Global Histogram Equalization', cat: 'point', desc: 'Flattens intensity histogram by Cumulative Distribution Function (CDF).', module: 'Histogram Processing' },
+            { key: 'clahe', title: '17. CLAHE (Local Adaptive Equalization)', cat: 'point', desc: '8×8 tile equalisation with clipLimit=2.0 preventing background noise blowup.', module: 'Histogram Processing' },
+
+            // Module 3: Spatial Filtering & Sharpening
+            { key: 'gaussian_blur', title: '18. Gaussian Low-Pass Filter (7×7)', cat: 'spatial', desc: 'Linear isotropic smoothing kernel suppressing high-frequency noise.', module: 'Spatial Filtering' },
+            { key: 'median_filter', title: '19. 2D Median Filter (5×5)', cat: 'spatial', desc: 'Non-linear rank-order filter perfectly stripping salt-and-pepper noise.', module: 'Spatial Filtering' },
+            { key: 'bilateral', title: '20. Bilateral Edge-Preserving Filter', cat: 'spatial', desc: 'Combines spatial domain distance with photometric range similarity.', module: 'Spatial Filtering' },
+            { key: 'unsharp_mask', title: '21. High-Boost Unsharp Masking', cat: 'spatial', desc: 'Sharpened = 1.5·Original - 0.5·Blurred: amplifies high-frequency edges.', module: 'Sharpening' },
+            { key: 'laplacian_sharp', title: '22. Laplacian High-Pass Sharpening', cat: 'spatial', desc: 'Second-order derivative operator: f\' = f - ∇²f.', module: 'Sharpening' },
+
+            // Module 4: Edge Detection & Gradients
+            { key: 'sobel_x', title: '23. Sobel Horizontal Gradient (Gx)', cat: 'edges', desc: 'First-order 3×3 derivative emphasizing vertical character strokes.', module: 'Edge Detection' },
+            { key: 'sobel_y', title: '24. Sobel Vertical Gradient (Gy)', cat: 'edges', desc: 'First-order derivative emphasizing horizontal character strokes.', module: 'Edge Detection' },
+            { key: 'sobel_combined', title: '25. Sobel Magnitude (√(Gx² + Gy²))', cat: 'edges', desc: 'Full gradient magnitude vector map of text contours.', module: 'Edge Detection' },
+            { key: 'prewitt', title: '26. Prewitt Edge Magnitude', cat: 'edges', desc: 'Gradient estimation using unweighted Prewitt difference masks.', module: 'Edge Detection' },
+            { key: 'laplacian', title: '27. Laplacian of Gaussian (LoG)', cat: 'edges', desc: 'Second derivative zero-crossing operator after Gaussian noise rejection.', module: 'Edge Detection' },
+            { key: 'canny', title: '28. Canny Optimal Edge Detector', cat: 'edges', desc: 'Multi-stage: Gaussian → Sobel → Non-Max Suppression → Hysteresis (50/150).', module: 'Edge Detection' },
+
+            // Module 5: Morphology
+            { key: 'dilation', title: '29. Morphological Dilation (3×3)', cat: 'morph', desc: 'A ⊕ B: Expands binary text features and bridges minor character fractures.', module: 'Binary Morphology' },
+            { key: 'erosion', title: '30. Morphological Erosion (3×3)', cat: 'morph', desc: 'A ⊖ B: Strips outer boundary layers and eliminates standalone speckles.', module: 'Binary Morphology' },
+            { key: 'opening', title: '31. Morphological Opening (Open = E ∘ D)', cat: 'morph', desc: '(A ⊖ B) ⊕ B: Strips small foreground noise without altering overall shape.', module: 'Binary Morphology' },
+            { key: 'closing', title: '32. Morphological Closing (Close = D • E)', cat: 'morph', desc: '(A ⊕ B) ⊖ B: Fills narrow background holes and bridges broken strokes.', module: 'Binary Morphology' },
+            { key: 'morph_grad', title: '33. Morphological Gradient', cat: 'morph', desc: '(A ⊕ B) - (A ⊖ B): Outlines structural boundary contours.', module: 'Binary Morphology' },
+            { key: 'tophat', title: '34. Top-Hat Transformation', cat: 'morph', desc: 'Original - Opening: Isolates bright elements smaller than structuring element.', module: 'Advanced Morphology' },
+            { key: 'blackhat', title: '35. Black-Hat Transformation', cat: 'morph', desc: 'Closing - Original: Isolates dark elements (text strokes) against background.', module: 'Advanced Morphology' },
+            { key: 'gray_dilation', title: '36. Grayscale Dilation', cat: 'morph', desc: 'Continuous min/max neighbourhood filtering across 8-bit grey levels.', module: 'Grayscale Morphology' },
+
+            // Module 6: Segmentation
+            { key: 'otsu', title: '37. Global Otsu Thresholding', cat: 'seg', desc: 'Maximizes between-class variance σ_B² (shows failure under illumination gradients).', module: 'Segmentation' },
+            { key: 'adaptive_gaussian', title: '38. Local Adaptive Gaussian Threshold', cat: 'seg', desc: 'Calculates independent threshold per pixel based on 31×31 local window.', module: 'Segmentation' },
+            { key: 'adaptive_mean', title: '39. Local Adaptive Mean Threshold', cat: 'seg', desc: 'Local mean neighbourhood threshold with constant offset C=10.', module: 'Segmentation' },
+
+            // Module 7: Frequency Domain
+            { key: 'dft', title: '40. 2D Fourier Spectrum Magnitude', cat: 'freq', desc: 'Frequency domain representation: 20·log(|F(u,v)| + 1) via 2D FFT.', module: 'Frequency Domain' },
+            { key: 'dft_highpass', title: '41. Ideal High-Pass Filter (IDFT)', cat: 'freq', desc: 'Attenuates DC/low spatial frequencies, preserving sharp edge transitions.', module: 'Frequency Domain' },
+            { key: 'dft_lowpass', title: '42. Ideal Low-Pass Filter (IDFT)', cat: 'freq', desc: 'Passes low spatial frequencies, demonstrating frequency-domain smoothing.', module: 'Frequency Domain' }
+        ];
+
+        // Form Submit Pipeline Execution
+        document.getElementById('upload-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const btn = document.getElementById('process-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Suite...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) {
+                    throw new Error(`Server returned HTTP ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // Update Metrics
+                document.getElementById('m-psnr').innerText = data.metrics.psnr;
+                document.getElementById('m-cir').innerText = data.metrics.cir;
+                document.getElementById('m-time').innerText = data.metrics.time;
+                document.getElementById('m-res').innerText = data.metrics.resolution;
+
+                // Update Hero Comparison
+                document.getElementById('hero-img-orig').src = 'data:image/jpeg;base64,' + data.grayscale;
+                document.getElementById('hero-img-hd').src = 'data:image/jpeg;base64,' + data.final_hd;
+                document.getElementById('download-hd').href = 'data:image/jpeg;base64,' + data.final_hd;
+
+                // Build Gallery Grid
+                const grid = document.getElementById('cards-grid');
+                grid.innerHTML = '';
+
+                PIPELINE_REGISTRY.forEach(item => {
+                    if (data[item.key]) {
+                        const card = document.createElement('div');
+                        card.className = 'gallery-card';
+                        card.dataset.category = item.cat;
+                        card.innerHTML = `
+                            <div class="card-head">
+                                <span class="module-badge">${item.module}</span>
+                                <h4>${item.title}</h4>
+                            </div>
+                            <div class="card-img-wrap" onclick="openModal('data:image/jpeg;base64,${data[item.key]}', '${item.title}')">
+                                <img src="data:image/jpeg;base64,${data[item.key]}" alt="${item.title}" loading="lazy">
+                                <div class="overlay"><i class="fa-solid fa-maximize"></i> Inspect</div>
+                            </div>
+                            <div class="card-footer">
+                                <p>${item.desc}</p>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    }
+                });
+
+                // Display Views
+                document.getElementById('empty-state').style.display = 'none';
+                document.getElementById('hero-banner').style.display = 'block';
+                document.getElementById('filter-nav').style.display = 'flex';
+                document.getElementById('gallery-container').style.display = 'block';
+
+            } catch (err) {
+                alert('Pipeline execution failed: ' + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Run IVP Master Suite';
+                btn.disabled = false;
+            }
+        };
+
+        // Category Filter Buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+
+                document.querySelectorAll('.gallery-card').forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Modal Zoom Inspection
+        function openModal(src, title) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-img');
+            const cap = document.getElementById('modal-caption');
+            modal.style.display = 'flex';
+            img.src = src;
+            cap.innerText = title;
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').style.display = 'none';
+        }
+
+        function toggleCompareMode() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
