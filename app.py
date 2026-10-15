@@ -231,32 +231,43 @@ def process():
     # 6. Multi-scale high-boost unsharp masking (fine edge pass + stroke body pass)
     # ════════════════════════════════════════════════════════
     hd_color = cv2.resize(bgr, (w * 2, h * 2), interpolation=cv2.INTER_LANCZOS4)
-    hd_med   = cv2.medianBlur(hd_color, 3)
-
-    lab = cv2.cvtColor(hd_med, cv2.COLOR_BGR2LAB)
+    lab = cv2.cvtColor(hd_color, cv2.COLOR_BGR2LAB)
     L, A, B = cv2.split(lab)
 
-    L_bil = cv2.bilateralFilter(L, d=5, sigmaColor=25, sigmaSpace=25)
+    L_med = cv2.medianBlur(L, 3)
 
-    clahe_master = cv2.createCLAHE(clipLimit=2.2, tileGridSize=(8, 8))
-    L_enh = clahe_master.apply(L_bil)
+    # Retinex Illumination Background Estimation & Division Normalization (Eradicates Shadows)
+    bg_L = cv2.GaussianBlur(L_med.astype(np.float32), (81, 81), 40)
+    L_norm = np.clip((L_med.astype(np.float32) / (bg_L + 1e-5)) * 250.0, 0, 255).astype(np.uint8)
 
-    # Multi-scale unsharp masking (Fine edge pass + stroke body pass)
-    blur_fine = cv2.GaussianBlur(L_enh, (0, 0), 0.8)
-    sharp_fine = cv2.addWeighted(L_enh, 1.8, blur_fine, -0.8, 0)
+    # Bilateral edge-preserving filter (smooths paper grain, locks crisp text contours)
+    L_bil = cv2.bilateralFilter(L_norm, d=7, sigmaColor=35, sigmaSpace=35)
+
+    # Multi-scale high-boost unsharp masking (fine edge contour + stroke body density)
+    blur_fine = cv2.GaussianBlur(L_bil, (0, 0), 1.0)
+    sharp_fine = cv2.addWeighted(L_bil, 1.75, blur_fine, -0.75, 0)
     sharp_fine = np.clip(sharp_fine, 0, 255).astype(np.uint8)
 
-    blur_med = cv2.GaussianBlur(sharp_fine, (0, 0), 2.0)
-    L_sharp  = cv2.addWeighted(sharp_fine, 1.3, blur_med, -0.3, 0)
-    L_sharp  = np.clip(L_sharp, 0, 255).astype(np.uint8)
+    blur_med = cv2.GaussianBlur(sharp_fine, (0, 0), 2.5)
+    sharp_body = cv2.addWeighted(sharp_fine, 1.35, blur_med, -0.35, 0)
+    sharp_body = np.clip(sharp_body, 0, 255).astype(np.uint8)
 
-    lab_restored = cv2.merge([L_sharp, A, B])
+    # Paper white calibration & deep text density tone curve
+    lut_hd = np.array([int(255 * ((i / 225.0) ** 1.35)) if i < 225 else 255 for i in range(256)], dtype=np.uint8)
+    L_final = cv2.LUT(sharp_body, lut_hd)
+
+    # Paper chroma neutralization (removes yellow shadow tint; preserves stamps and signatures)
+    is_paper = (L_final > 242).astype(np.float32)
+    A_clean = (A.astype(np.float32) * (1.0 - is_paper * 0.75) + 128.0 * (is_paper * 0.75)).astype(np.uint8)
+    B_clean = (B.astype(np.float32) * (1.0 - is_paper * 0.75) + 128.0 * (is_paper * 0.75)).astype(np.uint8)
+
+    lab_restored = cv2.merge([L_final, A_clean, B_clean])
     final_hd = cv2.cvtColor(lab_restored, cv2.COLOR_LAB2BGR)
     R['final_hd'] = b64(final_hd)
 
     # ─── Metrics ──────────────────────────────
-    psnr_val = psnr(gray, L_sharp)
-    cir_val  = cir(gray, L_sharp)
+    psnr_val = psnr(gray, L_final)
+    cir_val  = cir(gray, L_final)
     elapsed  = round(time.time() - start, 2)
 
     R['metrics'] = {
