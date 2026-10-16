@@ -23,6 +23,8 @@ function smartscan_pipeline(image_path)
     % Auto-detect image or fallback
     if nargin < 1 || isempty(image_path) || ~isfile(image_path)
         candidate_paths = { ...
+            fullfile(script_dir, 'samples', 'TestProject2.png'); ...
+            fullfile(script_dir, 'TestProject2.png'); ...
             fullfile(script_dir, 'samples', 'ProjectTest.png'); ...
             fullfile(script_dir, 'ProjectTest.png'); ...
             fullfile(script_dir, 'samples', 'sample_1_academic_shadowed.jpg'); ...
@@ -185,7 +187,8 @@ function smartscan_pipeline(image_path)
     %% Quantitative Benchmarks & Image Saving
     orig_mean = mean(double(gray(:)));
     rest_mean = mean(double(enhanced(:)));
-    pixel_distinction = mean(abs(double(imresize(gray, 2)) - double(rgb2gray(master_hd_color))));
+    diff_hd = abs(double(imresize(gray, [size(master_hd_color, 1), size(master_hd_color, 2)])) - double(rgb2gray(master_hd_color)));
+    pixel_distinction = mean(diff_hd(:));
     psnr_val = psnr(imresize(rgb2gray(master_hd_color), [h w]), gray);
     cir_val = std(double(enhanced(:))) / (std(double(gray(:))) + 1e-5);
 
@@ -209,36 +212,63 @@ function smartscan_pipeline(image_path)
     fprintf('  • Visual Distinction (Mean Shift)   : %.1f gray levels (Dramatic!)\n', pixel_distinction);
     fprintf('  • Peak Signal-to-Noise Ratio (PSNR) : %.2f dB\n', psnr_val);
     fprintf('  • Contrast Improvement Ratio (CIR) : %.2fx\n', cir_val);
-    fprintf('  • Output HD Resolution             : %d x %d px (2x Lanczos)\n', w*2, h*2);
+    fprintf('  • Output HD Resolution             : %d x %d px (2x Lanczos)\n', size(master_hd_color, 2), size(master_hd_color, 1));
     fprintf('  • Artifacts Saved In               : %s/\n', results_dir);
     fprintf('------------------------------------------------------------------------\n\n');
 
     %% Visual Multi-Stage Panel Display (8 Subplots matching Python)
     figure('Name', 'SmartScan Studio PRO - IVP Pipeline', 'NumberTitle', 'off');
 
-    if exist('tiledlayout', 'file') ~= 0
-        t = tiledlayout(2, 4, 'Padding', 'compact', 'TileSpacing', 'compact');
-        nexttile; imshow(gray); title('1. Original Degraded (Shadow & Noise)', 'FontWeight', 'bold');
-        nexttile; imshow(enhanced); title('2. Retinex Preprocessed (Pure White)', 'FontWeight', 'bold');
-        nexttile; imshow(edges); title('3. Canny Optimal Edges', 'FontWeight', 'bold');
-        nexttile; imshow(otsu_bin); title('4. Global Otsu (Catastrophic Failure)', 'FontWeight', 'bold');
-        nexttile; imshow(adaptive_bin); title('5. Local Adaptive Gaussian (Clean)', 'FontWeight', 'bold');
-        nexttile; imshow(final_output); title('6. Morphologically Cleaned (Open+Close)', 'FontWeight', 'bold');
-        nexttile; imshow(fourier_norm, []); colormap(gca, 'jet'); title('7. 2D Fourier Spectrum (DFT)', 'FontWeight', 'bold');
-        nexttile; imshow(master_hd_color); title('8. Master True-Color HD Output', 'FontWeight', 'bold');
-
-        title(t, sprintf('SmartScan Studio PRO | Faculty: Dr. Sachin Chavan | Visual Shift: +%.1f px | PSNR: %.2f dB', ...
-              pixel_distinction, psnr_val), 'FontSize', 13, 'FontWeight', 'bold');
+    % Display downscaling for responsive web/desktop rendering while preserving full HD on disk
+    max_disp_dim = 1200;
+    scale_disp = min(1.0, max_disp_dim / max([h, w]));
+    if scale_disp < 1.0
+        disp_gray = imresize(gray, scale_disp);
+        disp_enhanced = imresize(enhanced, scale_disp);
+        disp_edges = imresize(edges, scale_disp);
+        disp_otsu = imresize(otsu_bin, scale_disp);
+        disp_adaptive = imresize(adaptive_bin, scale_disp);
+        disp_final = imresize(final_output, scale_disp);
+        disp_fourier = imresize(fourier_norm, scale_disp);
+        disp_hd = imresize(master_hd_color, scale_disp * 0.5);
     else
-        subplot(2, 4, 1); imshow(gray); title('1. Original Degraded', 'FontWeight', 'bold');
-        subplot(2, 4, 2); imshow(enhanced); title('2. Retinex Preprocessed', 'FontWeight', 'bold');
-        subplot(2, 4, 3); imshow(edges); title('3. Canny Edges', 'FontWeight', 'bold');
-        subplot(2, 4, 4); imshow(otsu_bin); title('4. Global Otsu (Failure)', 'FontWeight', 'bold');
-        subplot(2, 4, 5); imshow(adaptive_bin); title('5. Local Adaptive', 'FontWeight', 'bold');
-        subplot(2, 4, 6); imshow(final_output); title('6. Morphologically Cleaned', 'FontWeight', 'bold');
-        subplot(2, 4, 7); imshow(fourier_norm, []); colormap(gca, 'jet'); title('7. 2D FFT Spectrum', 'FontWeight', 'bold');
-        subplot(2, 4, 8); imshow(master_hd_color); title('8. Master True-Color HD', 'FontWeight', 'bold');
+        disp_gray = gray;
+        disp_enhanced = enhanced;
+        disp_edges = edges;
+        disp_otsu = otsu_bin;
+        disp_adaptive = adaptive_bin;
+        disp_final = final_output;
+        disp_fourier = fourier_norm;
+        disp_hd = imresize(master_hd_color, 0.5);
     end
 
+    header_str = sprintf('SmartScan Studio PRO | Faculty: Dr. Sachin Chavan | Shift: +%.1f px | PSNR: %.2f dB', ...
+                         pixel_distinction, psnr_val);
+
+    if exist('tiledlayout', 'file') ~= 0
+        t = tiledlayout(2, 4, 'Padding', 'compact', 'TileSpacing', 'compact');
+        nexttile; imshow(disp_gray); title('1. Original Degraded', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_enhanced); title('2. Retinex Enhanced', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_edges); title('3. Canny Edges', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_otsu); title('4. Global Otsu (Failed)', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_adaptive); title('5. Local Adaptive', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_final); title('6. Morphological Clean', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_fourier, []); colormap(gca, 'jet'); title('7. 2D FFT Spectrum', 'FontWeight', 'bold', 'Interpreter', 'none');
+        nexttile; imshow(disp_hd); title('8. Master Color HD', 'FontWeight', 'bold', 'Interpreter', 'none');
+
+        title(t, header_str, 'FontSize', 12, 'FontWeight', 'bold', 'Interpreter', 'none');
+    else
+        subplot(2, 4, 1); imshow(disp_gray); title('1. Original Degraded', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 2); imshow(disp_enhanced); title('2. Retinex Enhanced', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 3); imshow(disp_edges); title('3. Canny Edges', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 4); imshow(disp_otsu); title('4. Global Otsu (Failed)', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 5); imshow(disp_adaptive); title('5. Local Adaptive', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 6); imshow(disp_final); title('6. Morphological Clean', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 7); imshow(disp_fourier, []); colormap(gca, 'jet'); title('7. 2D FFT Spectrum', 'FontWeight', 'bold', 'Interpreter', 'none');
+        subplot(2, 4, 8); imshow(disp_hd); title('8. Master Color HD', 'FontWeight', 'bold', 'Interpreter', 'none');
+    end
+
+    drawnow;
     fprintf('[SUCCESS] Pipeline executed successfully. Visual multi-stage figure rendered.\n');
+    fprintf('[TIP] If viewing in MATLAB Online, click the Maximize icon on the figure window to enlarge the preview.\n');
 end
