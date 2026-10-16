@@ -16,13 +16,108 @@ function smartscan_pipeline(image_path)
     fprintf(' SmartScan Studio PRO - Refined MATLAB Pipeline (1:1 Python Equivalent)\n');
     fprintf(' Faculty In-Charge: Dr. Sachin Chavan | NMIMS MPSTME\n');
     fprintf(' Team: Parth Chaturvedi (E235), Divyansh Karel (E236), Himanshu Garg (E250)\n');
+    fprintf('------------------------------------------------------------------------\n');
+    fprintf(' USAGE GUIDE (How to run on ANY image):\n');
+    fprintf('  • Any image file   : smartscan_pipeline(''your_image.jpg'')\n');
+    fprintf('  • Interactive popup: smartscan_pipeline(''select'')\n');
+    fprintf('  • Benchmark samples: smartscan_pipeline(1) to smartscan_pipeline(5)\n');
+    fprintf('  • Default auto-run : smartscan_pipeline\n');
     fprintf('========================================================================\n\n');
 
     % Determine current script directory
     script_dir = fileparts(mfilename('fullpath'));
 
-    % Auto-detect image or fallback
-    if nargin < 1 || isempty(image_path) || ~isfile(image_path)
+    % Benchmark Samples mapping (1 to 5)
+    sample_catalog = { ...
+        'sample_1_academic_shadowed.jpg', 'Academic Paper (Severe Shadow + Pepper Noise)'; ...
+        'sample_2_tax_invoice.jpg', 'Tax Invoice (Thermal Print + Gradient)'; ...
+        'sample_3_official_certificate.jpg', 'Degree Certificate (Fine Seal + Low Contrast)'; ...
+        'sample_4_book_spine_page.jpg', 'Book Spine Page (Falloff + Crease)'; ...
+        'sample_5_medical_prescription.jpg', 'Medical Prescription (Carbon Copy + Faded Ink)' ...
+    };
+
+    % Mode 1: Numeric benchmark index, e.g. smartscan_pipeline(1) to (5)
+    if nargin >= 1 && isnumeric(image_path) && isscalar(image_path)
+        sample_idx = round(image_path);
+        if sample_idx >= 1 && sample_idx <= size(sample_catalog, 1)
+            target_fname = sample_catalog{sample_idx, 1};
+            desc = sample_catalog{sample_idx, 2};
+            candidates = { ...
+                fullfile(script_dir, 'samples', target_fname); ...
+                fullfile(script_dir, target_fname); ...
+                fullfile(pwd, 'samples', target_fname); ...
+                fullfile(pwd, target_fname) ...
+            };
+            found = '';
+            for c = 1:length(candidates)
+                if isfile(candidates{c})
+                    found = candidates{c};
+                    break;
+                end
+            end
+            if ~isempty(found)
+                image_path = found;
+                fprintf('[BENCHMARK %d] Loaded: %s (%s)\n', sample_idx, target_fname, desc);
+            else
+                fprintf('[WARNING] Sample %d ("%s") not found. Falling back to auto-detect.\n', sample_idx, target_fname);
+                image_path = '';
+            end
+        else
+            fprintf('[WARNING] Benchmark index must be between 1 and 5. Falling back to auto-detect.\n');
+            image_path = '';
+        end
+    end
+
+    % Mode 2: Interactive file selection popup, e.g. smartscan_pipeline('select')
+    if nargin >= 1 && (ischar(image_path) || isstring(image_path)) && ...
+       (strcmpi(image_path, 'select') || strcmpi(image_path, 'browse') || strcmpi(image_path, 'ui') || strcmpi(image_path, 'open'))
+        [sel_file, sel_path] = uigetfile({'*.jpg;*.png;*.jpeg;*.bmp;*.tif;*.tiff', 'All Image Files (*.jpg, *.png, *.jpeg, *.bmp)'}, 'Select Document Image for SmartScan');
+        if isequal(sel_file, 0)
+            fprintf('[INFO] File selection cancelled. Using default fallback.\n');
+            image_path = '';
+        else
+            image_path = fullfile(sel_path, sel_file);
+            fprintf('[INTERACTIVE] Selected: %s\n', image_path);
+        end
+    end
+
+    % Mode 3: Custom image filename/path passed as string, e.g. smartscan_pipeline('flower.jpg')
+    if nargin >= 1 && ~isempty(image_path) && (ischar(image_path) || isstring(image_path))
+        raw_name = char(image_path);
+        if ~isfile(raw_name)
+            candidates = { ...
+                fullfile(pwd, raw_name); ...
+                fullfile(script_dir, raw_name); ...
+                fullfile(script_dir, 'samples', raw_name); ...
+                fullfile(pwd, 'samples', raw_name) ...
+            };
+            [~, ~, ext] = fileparts(raw_name);
+            if isempty(ext)
+                exts = {'.jpg', '.png', '.jpeg', '.bmp'};
+                for e = 1:length(exts)
+                    candidates{end+1} = fullfile(pwd, [raw_name exts{e}]); %#ok<AGROW>
+                    candidates{end+1} = fullfile(script_dir, [raw_name exts{e}]); %#ok<AGROW>
+                    candidates{end+1} = fullfile(script_dir, 'samples', [raw_name exts{e}]); %#ok<AGROW>
+                end
+            end
+            found = '';
+            for c = 1:length(candidates)
+                if isfile(candidates{c})
+                    found = candidates{c};
+                    break;
+                end
+            end
+            if ~isempty(found)
+                image_path = found;
+            else
+                fprintf('[WARNING] Could not locate image "%s". Falling back to default.\n', raw_name);
+                image_path = '';
+            end
+        end
+    end
+
+    % Mode 4: Auto-detection fallback if no argument was passed or file not found
+    if isempty(image_path) || ~isfile(image_path)
         candidate_paths = { ...
             fullfile(script_dir, 'samples', 'TestProject2.png'); ...
             fullfile(script_dir, 'TestProject2.png'); ...
