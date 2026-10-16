@@ -11,6 +11,7 @@
 
 function smartscan_pipeline(image_path)
     clc;
+    close all; % Cleanly reset any lingering figures from prior runs or page refreshes
     fprintf('========================================================================\n');
     fprintf(' SmartScan Studio PRO - Refined MATLAB Pipeline (1:1 Python Equivalent)\n');
     fprintf(' Faculty In-Charge: Dr. Sachin Chavan | NMIMS MPSTME\n');
@@ -247,15 +248,28 @@ function smartscan_pipeline(image_path)
 
     if exist('tiledlayout', 'file') ~= 0
         t = tiledlayout(2, 4, 'Padding', 'compact', 'TileSpacing', 'compact');
-        nexttile; imshow(disp_gray); title('1. Original Degraded', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_enhanced); title('2. Retinex Enhanced', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_edges); title('3. Canny Edges', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_otsu); title('4. Global Otsu (Failed)', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_adaptive); title('5. Local Adaptive', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_final); title('6. Morphological Clean', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_fourier, []); colormap(gca, 'jet'); title('7. 2D FFT Spectrum', 'FontWeight', 'bold', 'Interpreter', 'none');
-        nexttile; imshow(disp_hd); title('8. Master Color HD', 'FontWeight', 'bold', 'Interpreter', 'none');
-
+        stages = { ...
+            disp_gray, '1. Original Degraded', false; ...
+            disp_enhanced, '2. Retinex Enhanced', false; ...
+            disp_edges, '3. Canny Edges', false; ...
+            disp_otsu, '4. Global Otsu (Failed)', false; ...
+            disp_adaptive, '5. Local Adaptive', false; ...
+            disp_final, '6. Morphological Clean', false; ...
+            disp_fourier, '7. 2D FFT Spectrum', true; ...
+            disp_hd, '8. Master Color HD', false ...
+        };
+        for k = 1:8
+            ax = nexttile;
+            if stages{k, 3}
+                imshow(stages{k, 1}, []); colormap(ax, 'jet');
+            else
+                imshow(stages{k, 1});
+            end
+            title(stages{k, 2}, 'FontWeight', 'bold', 'Interpreter', 'none');
+            if isprop(ax, 'Toolbar') && ~isempty(ax.Toolbar)
+                ax.Toolbar.Visible = 'off';
+            end
+        end
         title(t, header_str, 'FontSize', 12, 'FontWeight', 'bold', 'Interpreter', 'none');
     else
         subplot(2, 4, 1); imshow(disp_gray); title('1. Original Degraded', 'FontWeight', 'bold', 'Interpreter', 'none');
