@@ -22,14 +22,14 @@ function smartscan_pipeline(image_path)
 
     % Auto-detect image or fallback
     if nargin < 1 || isempty(image_path) || ~isfile(image_path)
-        candidate_paths = {
-            fullfile(script_dir, 'samples', 'ProjectTest.png'),
-            fullfile(script_dir, 'ProjectTest.png'),
-            fullfile(script_dir, 'samples', 'sample_1_academic_shadowed.jpg'),
-            fullfile(script_dir, 'sample_document.jpg'),
-            fullfile(script_dir, 'samples', 'sample_2_tax_invoice.jpg'),
-            fullfile(script_dir, 'samples', 'sample_3_official_certificate.jpg'),
-            fullfile(pwd, 'sample_document.jpg')
+        candidate_paths = { ...
+            fullfile(script_dir, 'samples', 'ProjectTest.png'); ...
+            fullfile(script_dir, 'ProjectTest.png'); ...
+            fullfile(script_dir, 'samples', 'sample_1_academic_shadowed.jpg'); ...
+            fullfile(script_dir, 'sample_document.jpg'); ...
+            fullfile(script_dir, 'samples', 'sample_2_tax_invoice.jpg'); ...
+            fullfile(script_dir, 'samples', 'sample_3_official_certificate.jpg'); ...
+            fullfile(pwd, 'sample_document.jpg') ...
         };
         found_path = '';
         for i = 1:length(candidate_paths)
@@ -214,19 +214,31 @@ function smartscan_pipeline(image_path)
     fprintf('------------------------------------------------------------------------\n\n');
 
     %% Visual Multi-Stage Panel Display (8 Subplots matching Python)
-    fig = figure('Name', 'SmartScan Studio PRO - IVP Pipeline', 'NumberTitle', 'off', 'Position', [80 80 1380 820]);
+    figure('Name', 'SmartScan Studio PRO - IVP Pipeline', 'NumberTitle', 'off');
 
-    subplot(2, 4, 1); imshow(gray); title('1. Original Degraded (Shadow & Noise)', 'FontWeight', 'bold');
-    subplot(2, 4, 2); imshow(enhanced); title('2. Retinex Preprocessed (Pure White)', 'FontWeight', 'bold');
-    subplot(2, 4, 3); imshow(edges); title('3. Canny Optimal Edges', 'FontWeight', 'bold');
-    subplot(2, 4, 4); imshow(otsu_bin); title('4. Global Otsu (Catastrophic Failure)', 'FontWeight', 'bold');
-    subplot(2, 4, 5); imshow(adaptive_bin); title('5. Local Adaptive Gaussian (Clean)', 'FontWeight', 'bold');
-    subplot(2, 4, 6); imshow(final_output); title('6. Morphologically Cleaned (Open+Close)', 'FontWeight', 'bold');
-    subplot(2, 4, 7); imshow(fourier_norm, []); colormap(gca, 'jet'); title('7. 2D Fourier Spectrum (DFT)', 'FontWeight', 'bold');
-    subplot(2, 4, 8); imshow(master_hd_color); title('8. Master True-Color HD Output', 'FontWeight', 'bold');
+    if exist('tiledlayout', 'file') ~= 0
+        t = tiledlayout(2, 4, 'Padding', 'compact', 'TileSpacing', 'compact');
+        nexttile; imshow(gray); title('1. Original Degraded (Shadow & Noise)', 'FontWeight', 'bold');
+        nexttile; imshow(enhanced); title('2. Retinex Preprocessed (Pure White)', 'FontWeight', 'bold');
+        nexttile; imshow(edges); title('3. Canny Optimal Edges', 'FontWeight', 'bold');
+        nexttile; imshow(otsu_bin); title('4. Global Otsu (Catastrophic Failure)', 'FontWeight', 'bold');
+        nexttile; imshow(adaptive_bin); title('5. Local Adaptive Gaussian (Clean)', 'FontWeight', 'bold');
+        nexttile; imshow(final_output); title('6. Morphologically Cleaned (Open+Close)', 'FontWeight', 'bold');
+        nexttile; imshow(fourier_norm, []); colormap(gca, 'jet'); title('7. 2D Fourier Spectrum (DFT)', 'FontWeight', 'bold');
+        nexttile; imshow(master_hd_color); title('8. Master True-Color HD Output', 'FontWeight', 'bold');
 
-    sgtitle(sprintf('SmartScan Studio PRO | Faculty: Dr. Sachin Chavan | Visual Shift: +%.1f px | PSNR: %.2f dB', ...
-            pixel_distinction, psnr_val), 'FontSize', 14, 'FontWeight', 'bold');
+        title(t, sprintf('SmartScan Studio PRO | Faculty: Dr. Sachin Chavan | Visual Shift: +%.1f px | PSNR: %.2f dB', ...
+              pixel_distinction, psnr_val), 'FontSize', 13, 'FontWeight', 'bold');
+    else
+        subplot(2, 4, 1); imshow(gray); title('1. Original Degraded', 'FontWeight', 'bold');
+        subplot(2, 4, 2); imshow(enhanced); title('2. Retinex Preprocessed', 'FontWeight', 'bold');
+        subplot(2, 4, 3); imshow(edges); title('3. Canny Edges', 'FontWeight', 'bold');
+        subplot(2, 4, 4); imshow(otsu_bin); title('4. Global Otsu (Failure)', 'FontWeight', 'bold');
+        subplot(2, 4, 5); imshow(adaptive_bin); title('5. Local Adaptive', 'FontWeight', 'bold');
+        subplot(2, 4, 6); imshow(final_output); title('6. Morphologically Cleaned', 'FontWeight', 'bold');
+        subplot(2, 4, 7); imshow(fourier_norm, []); colormap(gca, 'jet'); title('7. 2D FFT Spectrum', 'FontWeight', 'bold');
+        subplot(2, 4, 8); imshow(master_hd_color); title('8. Master True-Color HD', 'FontWeight', 'bold');
+    end
 
     fprintf('[SUCCESS] Pipeline executed successfully. Visual multi-stage figure rendered.\n');
 end
