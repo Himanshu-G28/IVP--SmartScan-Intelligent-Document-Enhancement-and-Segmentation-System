@@ -168,7 +168,7 @@ def create_report():
     style_table(table_members, col_w, ["Roll No.", "Student Name", "Project Allocation"], [
         ["E235", "Parth Chaturvedi", "Preprocessing & CLAHE"],
         ["E236", "Divyansh Karel", "Edge Detection & Segmentation"],
-        ["E250", "Himanshu Garg (Lead)", "Morphology, 2D DFT & HD Engine"]
+        ["E250", "Himanshu Garg", "Morphology, 2D DFT & HD Engine"]
     ])
 
     doc.add_page_break()
@@ -502,7 +502,7 @@ def create_report():
     role_data = [
         ["Parth Chaturvedi", "E235", "Stage 1: Ingestion, Color Spaces & Preprocessing", "Implementation of RGB/HSV/LAB conversions, median filtering, Gaussian background estimation, and CLAHE module."],
         ["Divyansh Karel", "E236", "Stages 2 & 3: Edge Operators & Segmentation", "Implementation of Sobel and Canny edge detectors, mathematical analysis of Otsu failure, and Adaptive Gaussian binarization."],
-        ["Himanshu Garg", "E250\n(Lead)", "Stages 4 & 5: Morphology, DFT & Master HD Engine", "Design of dual morphology kernels, 2D FFT spectral analyzer, Master 2x HD Lanczos-4 engine, and full-stack integration."]
+        ["Himanshu Garg", "E250", "Stages 4 & 5: Morphology, DFT & Master HD Engine", "Design of dual morphology kernels, 2D FFT spectral analyzer, Master 2x HD Lanczos-4 engine, and full-stack integration."]
     ]
     t_roles = doc.add_table(rows=1, cols=4)
     style_table(t_roles, [Inches(1.5), Inches(0.8), Inches(2.2), Inches(2.5)], ["Team Member", "Roll No.", "Domain Focus", "Key Technical Contributions"], role_data)
@@ -727,7 +727,7 @@ def create_report():
         "• Course Code & Title : Image and Video Processing (702EX0E020)\n"
         "• Institution         : SVKM's NMIMS MPSTME, Mumbai\n"
         "• Faculty In-Charge   : Dr. Sachin Chavan\n"
-        "• Group Roll Numbers  : E235 (Parth), E236 (Divyansh), E250 (Himanshu - Lead)\n"
+        "• Group Roll Numbers  : E235 (Parth), E236 (Divyansh), E250 (Himanshu)\n"
         "• GitHub Repository   : https://github.com/himanshugarg-01/SmartScan-Studio-PRO\n"
         "• Submission Folder   : 'to be submitted/' (Containing CLI, Web Studio, MATLAB Script, Word Report, PPTX)",
         align=WD_ALIGN_PARAGRAPH.LEFT

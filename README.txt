@@ -6,7 +6,7 @@ Faculty Guide : Dr. Sachin Chavan, Associate Professor (Computer Engineering)
 Team Members  :
   1. Parth Chaturvedi (Roll No. E235) - Preprocessing, Median Filtering & CLAHE
   2. Divyansh Karel   (Roll No. E236) - Edge Detection, Otsu vs Adaptive Segmentation
-  3. Himanshu Garg    (Roll No. E250, Lead) - Morphology, 2D DFT & Master HD Engine
+  3. Himanshu Garg    (Roll No. E250) - Morphology, 2D DFT & Master HD Engine
 ================================================================================
 
 PROJECT REPOSITORY (GITHUB):

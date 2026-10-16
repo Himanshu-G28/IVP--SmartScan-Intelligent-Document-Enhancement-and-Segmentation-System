@@ -221,7 +221,7 @@ def process():
     R['dft_lowpass'] = b64(cv2.normalize(idft_lp, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8))
 
     # ════════════════════════════════════════════════════════
-    # FINAL HD ENHANCED OUTPUT — Stage 4 (Himanshu Garg)
+    # FINAL HD ENHANCED OUTPUT — Master True-Color Restoration
     # Master True-Color High-Definition Document Restoration:
     # 1. 2× Lanczos-4 Super-Resolution Upscaling (doubles pixel density first)
     # 2. Sub-pixel rank-order median filtering (removes impulse noise without stroke loss)

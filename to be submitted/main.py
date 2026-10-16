@@ -8,7 +8,7 @@ Faculty       : Dr. Sachin Chavan
 Team Members  :
   1. Parth Chaturvedi (Roll No. E235) - Stage 1: Data Rep, Color Spaces & Preprocessing
   2. Divyansh Karel   (Roll No. E236) - Stage 2 & 3: Edge Operators & Segmentation
-  3. Himanshu Garg    (Roll No. E250, Lead) - Stage 4 & 5: Morphology, 2D DFT, HD Engine & Full Pipeline
+  3. Himanshu Garg    (Roll No. E250) - Stage 4 & 5: Morphology, 2D DFT & HD Engine
 ================================================================================
 """
 
@@ -60,7 +60,7 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
     print("=" * 76)
     print(" SmartScan Studio PRO - Complete IVP Execution Pipeline")
     print(" Faculty In-Charge: Dr. Sachin Chavan | NMIMS MPSTME")
-    print(" Team: Parth (E235), Divyansh (E236), Himanshu (E250 - Lead)")
+    print(" Team: Parth Chaturvedi (E235), Divyansh Karel (E236), Himanshu Garg (E250)")
     print("=" * 76)
 
     # Resolve input image path
@@ -94,9 +94,9 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
 
     # --------------------------------------------------------------------------
-    # STAGE 1: Preprocessing & Illumination Normalization (Parth Chaturvedi - E235)
+    # STAGE 1: Preprocessing & Illumination Normalization
     # --------------------------------------------------------------------------
-    print("[STAGE 1] Preprocessing: Median Denoising & Retinex Illumination Normalization (Parth)...")
+    print("[STAGE 1] Preprocessing: Median Denoising & Retinex Illumination Normalization...")
     # A. 2D Median filter (5x5) eliminates salt-and-pepper impulses without edge blurring
     med = cv2.medianBlur(gray, 5)
 
@@ -109,9 +109,9 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
     enhanced = cv2.LUT(norm, lut_tone)
 
     # --------------------------------------------------------------------------
-    # STAGE 2: Edge Detection & Boundary Analysis (Divyansh Karel - E236)
+    # STAGE 2: Edge Detection & Boundary Analysis
     # --------------------------------------------------------------------------
-    print("[STAGE 2] Boundary Extraction: Sobel Magnitude & Canny Detector (Divyansh)...")
+    print("[STAGE 2] Boundary Extraction: Sobel Magnitude & Canny Detector...")
     # A. Sobel first-order gradients
     gx = cv2.Sobel(enhanced, cv2.CV_64F, 1, 0, ksize=3)
     gy = cv2.Sobel(enhanced, cv2.CV_64F, 0, 1, ksize=3)
@@ -122,9 +122,9 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
     canny_edges = cv2.Canny(enhanced, 50, 150)
 
     # --------------------------------------------------------------------------
-    # STAGE 3: Document Segmentation: Otsu vs Adaptive (Divyansh Karel - E236)
+    # STAGE 3: Document Segmentation: Otsu vs Adaptive
     # --------------------------------------------------------------------------
-    print("[STAGE 3] Document Segmentation: Global Otsu vs Local Adaptive (Divyansh)...")
+    print("[STAGE 3] Document Segmentation: Global Otsu vs Local Adaptive...")
     # A. Global Otsu Thresholding on RAW input (Demonstrates catastrophic failure under shadow gradients)
     _, otsu_bin = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
@@ -133,9 +133,9 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
                                          cv2.THRESH_BINARY, 31, 10)
 
     # --------------------------------------------------------------------------
-    # STAGE 4: Mathematical Morphology (Himanshu Garg - E250)
+    # STAGE 4: Mathematical Morphology
     # --------------------------------------------------------------------------
-    print("[STAGE 4] Mathematical Morphology: Opening & Closing (Himanshu)...")
+    print("[STAGE 4] Mathematical Morphology: Opening & Closing...")
     # Invert image so black text becomes white foreground (255)
     inv_text = cv2.bitwise_not(adaptive_bin)
 
@@ -151,18 +151,18 @@ def run_pipeline(image_path=None, sample_num=None, show_ui=True, save_prefix="")
     morph_clean = cv2.bitwise_not(closed)
 
     # --------------------------------------------------------------------------
-    # STAGE 5: Transform Domain / 2D DFT (Himanshu Garg - E250)
+    # STAGE 5: Transform Domain / 2D DFT
     # --------------------------------------------------------------------------
-    print("[STAGE 5] Frequency Analysis: 2D Discrete Fourier Transform (Himanshu)...")
+    print("[STAGE 5] Frequency Analysis: 2D Discrete Fourier Transform...")
     dft = np.fft.fft2(gray.astype(np.float32))
     dft_shift = np.fft.fftshift(dft)
     dft_mag = 20.0 * np.log(np.abs(dft_shift) + 1.0)
     dft_norm = cv2.normalize(dft_mag, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
     # --------------------------------------------------------------------------
-    # MASTER TRUE-COLOR HD RESTORATION (Himanshu Garg - Lead Architecture)
+    # MASTER TRUE-COLOR HD RESTORATION
     # --------------------------------------------------------------------------
-    print("[MASTER ENGINE] 2x Lanczos-4 Super-Resolution & Retinex Color HD Engine (Himanshu)...")
+    print("[MASTER ENGINE] 2x Lanczos-4 Super-Resolution & Retinex Color HD Engine...")
     # 1. 2x Super-Resolution Upscaling using Lanczos-4 (8-lobed sinc) interpolation
     hd_color = cv2.resize(bgr, (w * 2, h * 2), interpolation=cv2.INTER_LANCZOS4)
 

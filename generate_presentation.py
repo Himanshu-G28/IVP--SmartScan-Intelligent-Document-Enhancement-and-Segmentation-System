@@ -140,9 +140,9 @@ def build_presentation():
     tb = s1.shapes.add_textbox(Inches(7.1), Inches(5.1), Inches(5.2), Inches(1.5))
     tf = tb.text_frame
     lines2 = [
-        ("• Himanshu Garg (E250 - Lead): ", True, COLOR_WHITE), ("Morphology, DFT, HD Engine\n", False, COLOR_TEXT_MUTED),
         ("• Parth Chaturvedi (E235): ", True, COLOR_WHITE), ("Preprocessing, Median Filter & CLAHE\n", False, COLOR_TEXT_MUTED),
         ("• Divyansh Karel (E236): ", True, COLOR_WHITE), ("Edge Operators & Adaptive Segmentation\n", False, COLOR_TEXT_MUTED),
+        ("• Himanshu Garg (E250): ", True, COLOR_WHITE), ("Morphology, DFT, HD Engine\n", False, COLOR_TEXT_MUTED),
         ("• Codebase: ", True, COLOR_WHITE), ("Turnkey Python CLI, Web Studio & Standalone MATLAB", False, COLOR_GREEN)
     ]
     p = tf.paragraphs[0]
@@ -595,7 +595,7 @@ def build_presentation():
              "• Divyansh Karel (Roll No. E236):\n" \
              "  - Sobel gradient operators & Canny hysteresis edge detector.\n" \
              "  - Mathematical analysis of Otsu failure & Local Adaptive Gaussian binarization.\n\n" \
-             "• Himanshu Garg (Roll No. E250 - Project Lead):\n" \
+             "• Himanshu Garg (Roll No. E250):\n" \
              "  - Dual morphological Opening & Closing filters.\n" \
              "  - 2D DFT frequency spectrum characterization.\n" \
              "  - Master 2x HD Lanczos-4 Restoration Engine & Full-Stack Architecture."

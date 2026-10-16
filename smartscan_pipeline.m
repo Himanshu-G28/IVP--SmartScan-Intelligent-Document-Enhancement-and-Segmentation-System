@@ -4,9 +4,9 @@
 % Institution   : NMIMS University, MPSTME
 % Faculty       : Dr. Sachin Chavan
 % Group Members :
-%   1. Parth Chaturvedi (Roll No. E235) - Preprocessing & CLAHE
-%   2. Divyansh Karel   (Roll No. E236) - Edge Detection & Segmentation
-%   3. Himanshu Garg    (Roll No. E250, Lead) - Morphology, 2D DFT & Evaluation
+%   1. Parth Chaturvedi (Roll No. E235) - Preprocessing & Illumination Normalization
+%   2. Divyansh Karel   (Roll No. E236) - Edge Detection & Document Segmentation
+%   3. Himanshu Garg    (Roll No. E250) - Mathematical Morphology & 2D DFT
 % =========================================================================
 
 function smartscan_pipeline(image_path)
@@ -14,7 +14,7 @@ function smartscan_pipeline(image_path)
     fprintf('========================================================================\n');
     fprintf(' SmartScan Studio PRO - Refined MATLAB Pipeline (1:1 Python Equivalent)\n');
     fprintf(' Faculty In-Charge: Dr. Sachin Chavan | NMIMS MPSTME\n');
-    fprintf(' Team: Parth (E235), Divyansh (E236), Himanshu (E250 - Lead)\n');
+    fprintf(' Team: Parth Chaturvedi (E235), Divyansh Karel (E236), Himanshu Garg (E250)\n');
     fprintf('========================================================================\n\n');
 
     % Determine current script directory
@@ -71,8 +71,8 @@ function smartscan_pipeline(image_path)
 
     [h, w] = size(gray);
 
-    %% STAGE 1: Preprocessing & Retinex Normalization (Parth Chaturvedi - E235)
-    fprintf('[STAGE 1] Preprocessing: Median Denoising & Retinex Illumination Normalization (Parth)...\n');
+    %% STAGE 1: Preprocessing & Retinex Normalization
+    fprintf('[STAGE 1] Preprocessing: Median Denoising & Retinex Illumination Normalization...\n');
     % 1A: 2D Median Filter (5x5) eliminates salt-and-pepper impulses without edge blurring
     med = medfilt2(gray, [5 5]);
 
@@ -87,13 +87,13 @@ function smartscan_pipeline(image_path)
     enhanced_d(~mask_text) = 255.0;
     enhanced = uint8(enhanced_d);
 
-    %% STAGE 2: Edge Detection & Boundary Analysis (Divyansh Karel - E236)
-    fprintf('[STAGE 2] Boundary Extraction: Sobel Magnitude & Canny Detector (Divyansh)...\n');
+    %% STAGE 2: Edge Detection & Boundary Analysis
+    fprintf('[STAGE 2] Boundary Extraction: Sobel Magnitude & Canny Detector...\n');
     % Canny optimal hysteresis edge detection matching Python's thresholds [50, 150]
     edges = edge(enhanced, 'canny', [50/255, 150/255]);
 
-    %% STAGE 3: Document Segmentation: Otsu vs Adaptive (Divyansh Karel - E236)
-    fprintf('[STAGE 3] Document Segmentation: Global Otsu vs Local Adaptive (Divyansh)...\n');
+    %% STAGE 3: Document Segmentation: Otsu vs Adaptive
+    fprintf('[STAGE 3] Document Segmentation: Global Otsu vs Local Adaptive...\n');
     % Method A: Global Otsu on RAW gray image (Demonstrates catastrophic failure under shadow gradients)
     level = graythresh(gray);
     otsu_bin = imbinarize(gray, level);
@@ -106,8 +106,8 @@ function smartscan_pipeline(image_path)
         adaptive_bin = imbinarize(enhanced, 'adaptive', 'ForegroundPolarity', 'dark', 'Sensitivity', 0.55);
     end
 
-    %% STAGE 4: Mathematical Morphology (Himanshu Garg - E250)
-    fprintf('[STAGE 4] Mathematical Morphology: Opening & Closing (Himanshu)...\n');
+    %% STAGE 4: Mathematical Morphology
+    fprintf('[STAGE 4] Mathematical Morphology: Opening & Closing...\n');
     % Invert image so black text becomes white foreground (logical 1)
     inv_text = ~adaptive_bin;
 
@@ -122,15 +122,15 @@ function smartscan_pipeline(image_path)
     % Invert back to document standard: black text on clean white canvas
     final_output = uint8(~closed) * 255;
 
-    %% STAGE 5: Transform Domain / 2D DFT (Himanshu Garg - E250)
-    fprintf('[STAGE 5] Frequency Analysis: 2D Discrete Fourier Transform (Himanshu)...\n');
+    %% STAGE 5: Transform Domain / 2D DFT
+    fprintf('[STAGE 5] Frequency Analysis: 2D Discrete Fourier Transform...\n');
     F = fft2(double(gray));
     F_shift = fftshift(F);
     fourier_mag = 20.0 * log(1 + abs(F_shift));
     fourier_norm = mat2gray(fourier_mag);
 
-    %% MASTER TRUE-COLOR HD RESTORATION (Himanshu Garg - Lead Architecture)
-    fprintf('[MASTER ENGINE] 2x Lanczos Super-Resolution & Retinex Color HD Engine (Himanshu)...\n');
+    %% MASTER TRUE-COLOR HD RESTORATION
+    fprintf('[MASTER ENGINE] 2x Lanczos Super-Resolution & Retinex Color HD Engine...\n');
     if size(img_color, 3) == 3
         % 1. 2x Super-Resolution Upscaling using Lanczos-3 interpolation
         hd_color = imresize(img_color, 2, 'lanczos3');
